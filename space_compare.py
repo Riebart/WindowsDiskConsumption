@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import csv
@@ -79,11 +79,11 @@ def to_list(files):
 
     proc = subprocess.Popen(
         ("tsort"), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    proc.stdin.write("\n".join(["%d %d" % p for p in tsort_input]))
+    proc.stdin.write(("\n".join(["%d %d" % p for p in tsort_input])).encode("utf-8"))
     so, _ = proc.communicate()
     ordering = [
         hierarchy_ids["Reverse"][int(h.strip())]
-        for h in so.strip().split("\n")
+        for h in so.decode("utf-8").strip().split("\n")
     ]
 
     # Now, start with the first one, which should be the root of everything.
@@ -192,11 +192,12 @@ files_ab = drop_duplicates(diff["AB"] + dirs, lambda v: v["FullName"], lambda a,
 })
 
 for f in files_ab:
-    if f["Length"] < 0:
-        f["Length"] *= -1
-        diff["A"].append(f)
-    elif f["Length"] > 0:
-        diff["B"].append(f)
+    if f["Length"] != "":
+        if f["Length"] < 0:
+            f["Length"] *= -1
+            diff["A"].append(f)
+        elif f["Length"] > 0:
+            diff["B"].append(f)
 
 files_a = drop_duplicates(diff["A"] + dirs, lambda v: v["FullName"])
 files_b = drop_duplicates(diff["B"] + dirs, lambda v: v["FullName"])
